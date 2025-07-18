@@ -1,4 +1,4 @@
-from .models import RequestLog
+from ..ip_trackingee.models import RequestLog
 from django.utils.deprecation import MiddlewareMixin
 from ipware import get_client_ip
 
