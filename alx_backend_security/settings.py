@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+from celery.schedules import crontab
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u&l14$%s!6-dm(p$42hm0(ytx11lm^n4p#bziu7+o$85c@=7!a'
+# SECRET_KEY = 'django-insecure-u&l14$%s!6-dm(p$42hm0(ytx11lm^n4p#bziu7+o$85c@=7!a'
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-default-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ip_tracking',
+    'ratelimit',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'ip_tracking.middleware.LogIPMiddleware',
 ]
 
 ROOT_URLCONF = 'alx_backend_security.urls'
@@ -99,6 +106,23 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
+CELERY_BEAT_SCHEDULE = {
+    'detect-suspicious-ips-every-hour': {
+        'task': 'ip_tracking.tasks.detect_suspicious_ips',
+        'schedule': crontab(minute=0, hour='*'),
+    },
+}
+
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

@@ -1,0 +1,7 @@
+Django>=3.2,<5.0
+django-ipware
+ipinfo
+django-ratelimit
+celery
+redis
+django-celery-beat
