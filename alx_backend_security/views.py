@@ -1,0 +1,5 @@
+from django.http import HttpResponse
+
+
+def home(request):
+    return HttpResponse("Welcome to the IP Tracking API. Visit /swagger/ to view the documentation.")
