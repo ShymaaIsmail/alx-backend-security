@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ip_tracking',
     'django_celery_beat',
-    'ratelimit',
     'rest_framework',
     'drf_yasg',
 ]
